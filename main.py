@@ -34,7 +34,7 @@ def timestamp(timestamp):
     return formatted_time
 
 
-TOKEN = token=os.environ.get('TOKEN')
+TOKEN = os.environ.get('TOKEN')
 bot = telebot.TeleBot(TOKEN, exception_handler=MyExceptionHandler())
 
 
@@ -135,8 +135,8 @@ def GetData(UID, Fetch_url):
 
     encoded_result = encode(example_json)
     normal_text = encoded_result.replace("<", "").replace(">", "").replace(" ", "")
-    key = token=os.environ.get('KEY')
-    iv = token=os.environ.get('IV')
+    key = os.environ.get('KEY')
+    iv = os.environ.get('IV')
     plaintext = binascii.unhexlify(normal_text)
     encrypted_text = aes_cbc_encrypt(key, iv, plaintext)
     
