@@ -16,10 +16,14 @@ import pytz
 import time
 import sample_pb2
 from keep_alive import keep_alive
+from telebot import types, ExceptionHandler
 keep_alive()
 
 
-
+class MyExceptionHandler(ExceptionHandler):
+    async def handle(self, exception):
+        print(exception)
+        
 
 def timestamp(timestamp):
     timezone_str = 'Asia/Kolkata'  # GMT+05:30
@@ -31,7 +35,7 @@ def timestamp(timestamp):
 
 
 TOKEN = token=os.environ.get('TOKEN')
-bot = telebot.TeleBot(TOKEN)
+bot = telebot.TeleBot(TOKEN, exception_handler=MyExceptionHandler())
 
 
 
@@ -219,5 +223,15 @@ def handle_sticker(message):
 
     except Exception as e:
         print(e)
+
+
+
+@bot.message_handler(commands=['cancel', 'start'])
+def start_fun(message):
+    message_text = "🤖"
+    bot.send_chat_action(message.chat.id, 'typing')
+    bot.reply_to(message, message_text, parse_mode="Markdown")
+
+
 
 bot.polling(none_stop=True)
