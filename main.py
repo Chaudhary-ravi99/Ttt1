@@ -1,11 +1,18 @@
 import telebot
 import os
 import requests
+from datetime import datetime
+import pytz
+import json
+
 from keep_alive import keep_alive
 keep_alive()
 
-
 bot = telebot.TeleBot(token=os.environ.get('token'))
+def timestamp(timestamp):
+    dt = datetime.utcfromtimestamp(timestamp).replace(tzinfo=pytz.utc)
+    local_time = dt.astimezone(pytz.timezone('Asia/Kolkata')).strftime('%d %b %y %I:%M %p')
+    return local_time
 
 def get_data(UID):
     headers = {
@@ -26,13 +33,41 @@ def get_data(UID):
     'uid': UID,
 }
     response = requests.get('https://ff-info.vercel.app/', params=params, headers=headers)
-    return response.content
+    return response.text
 
 @bot.message_handler(func=lambda message: True)
 def echo_all(message):
+
+
     data = get_data(message.text)
-    message_text = f"```json\n{data}```"
-    bot.reply_to(message, message_text, parse_mode="Markdown")
+    data_dict = json.loads(data)
+    message_text = f"""
+𝗔𝗖𝗖𝗢𝗨𝗡𝗧 𝗜𝗡𝗙𝗢
+├─Nᴀᴍᴇ: `{data_dict["Nickname"]}`
+├─Uɪᴅ: `{data_dict["AccountUID"]}`
+├─Lᴠ: {data_dict["Level"]} 
+│    └─Exᴘ: {data_dict["Exp"]}
+├─Rᴇɢɪᴏɴ: {data_dict["Region"]}
+├─Lɪᴋᴇ: {data_dict["Like"]}
+├─Bᴀɴɴᴇʀ Iᴅ: `{data_dict["BannerID"]}`
+├─Aᴠᴀᴛᴀʀ Iᴅ: `{data_dict["AvatarID"]}`
+├─Bɪᴏ: `{data_dict["Bio"]}`
+├─𝗔𝗖𝗖𝗢𝗨𝗡𝗧 𝗔𝗖𝗧𝗜𝗩𝗜𝗧𝗬
+│  ├─Bʀ Rᴀɴᴋ: {data_dict["BrPoint"]} ({data_dict["BrScore"]})
+│  ├─Lᴀsᴛ Lᴏɢɪɴ: {timestamp(int(data_dict["LastLogin"]))}
+│  └─Cʀᴇᴀᴛᴇᴅ Aᴛ: {timestamp(int(data_dict["AccountCreated"]))}
+└─𝗚𝗨𝗜𝗟𝗗 𝗜𝗡𝗙𝗢
+          ├─Nᴀᴍᴇ: `{data_dict["GuildName"]}`
+          ├─Iᴅ: `{data_dict["GuildID"]}`
+          └─*Leader Info*
+                     ├─Nᴀᴍᴇ: `{data_dict["GuildLeaderNickName"]}`
+                     ├─Uɪᴅ: `{data_dict["GuildLeaderUid"]}`
+                     └─Lᴠ: {data_dict["GuildLeaderLvl"]} 
+                             └─Exᴘ: {data_dict["GuildLeaderExp"]}
+"""
+    
+    PROFILE_URL = data_dict["ProfileUrl"]
+    bot.send_photo(message.chat.id, PROFILE_URL, caption=message_text, reply_to_message_id=message.message_id, parse_mode="Markdown")
 
 if __name__ == '__main__':
     bot.polling()
