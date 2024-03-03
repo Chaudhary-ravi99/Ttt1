@@ -8,7 +8,7 @@ import json
 from keep_alive import keep_alive
 keep_alive()
 
-bot = telebot.TeleBot(token=os.environ.get('6420067954:AAHWGtqTWef4TJ5OjrixQheYO1X9ByrOSUM'))
+bot = telebot.TeleBot(token=os.environ.get('7116309895:AAFnL31sadM5C0mOgAI1Zy9RBw2zFjl5eOw'))
 def timestamp(timestamp):
     dt = datetime.utcfromtimestamp(timestamp).replace(tzinfo=pytz.utc)
     local_time = dt.astimezone(pytz.timezone('Asia/Kolkata')).strftime('%d %b %y %I:%M %p')
